@@ -1,0 +1,31 @@
+.dataGrid {
+  display: flex;
+  flex-direction: column;
+  max-width: 80%;
+  margin: 0 auto;
+
+  .dataGrid__header {
+	display: flex;
+	background-color: #ccc;
+
+	.dataGrid__headerCell {
+	  padding: 8px;
+	  border: 1px solid #aaa;
+	}
+  }
+
+  .dataGrid__body {
+	.dataGrid__row {
+	  display: flex;
+
+	  &:nth-child(even) {
+		background-color: #f5f5f5;
+	  }
+
+	  .dataGrid__cell {
+		padding: 8px;
+		border: 1px solid #aaa;
+	  }
+	}
+  }
+}
