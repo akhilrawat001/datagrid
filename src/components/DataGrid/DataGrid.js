@@ -51,37 +51,16 @@ function DataGrid({
 }) {
     const {
         columns,
-        callAPI,
         loading,
         totalRows,
         columnWidths,
+        lastRowRef
     } = options;
     const [sortedData, setSortedData] = useState([]);
     const [tableData, setTableData] = useState([]);
     const [sortKey, setSortKey] = useState('');
     const [sortingType, setSortingType] = useState(NO_SORT);
     const [searchTerm, setSearchTerm] = useState('');
-    const lastRow = useRef(null);
-
-    const handleObserver = useCallback((entries) => {
-        const target = entries[0];
-        if (target.isIntersecting && data.length) {
-            console.log(searchTerm);
-            callAPI();
-        }
-    }, [!!data.length]);
-
-    useEffect(() => {
-        const option = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0,
-        };
-        if (lastRow.current) {
-            const observer = new IntersectionObserver(handleObserver, option);
-            observer.observe(lastRow.current);
-        }
-    }, [handleObserver]);
 
     useEffect(() => {
         if (sortKey) {
@@ -173,20 +152,14 @@ function DataGrid({
                                 columnWidths={columnWidths}
                             />
                         ))}
-                    {
-                        searchTerm === '' ?
-                            (
-                                <div ref={lastRow} className={styles.dataGrid__lastRow}>
-                                    <DataGridRow
-                                        row={tableData[0] || {}}
-                                        key={'last-row'}
-                                        columns={columns}
-                                        columnWidths={columnWidths}
-                                    />
-                                </div>
-                            )
-                            : <></>
-                    }
+                    <div ref={lastRowRef} className={styles.dataGrid__lastRow}>
+                        <DataGridRow
+                            row={tableData[0] || {}}
+                            key={'last-row'}
+                            columns={columns}
+                            columnWidths={columnWidths}
+                        />
+                    </div>
                 </div>
             </div>
             <div className={styles.dataGrid__footer}>

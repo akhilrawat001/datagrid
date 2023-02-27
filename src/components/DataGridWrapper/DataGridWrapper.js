@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styles from './DataGridWrapper.module.scss';
 import DataGrid from '../DataGrid/DataGrid';
 import axios from 'axios';
 import getColumnWidth from '../../utils/ColumnWidth';
 
-
 const DataGridWrapper = ({ apiUrl }) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [columnWidths, setColumnWidths] = useState({});
+    const lastRow = useRef(null);
 
     useEffect(() => {
         for (let index in columns) {
@@ -40,9 +40,25 @@ const DataGridWrapper = ({ apiUrl }) => {
             });
     };
 
-    useEffect(() => {
-        fetchAPIData();
+    const handleObserver = useCallback((entries) => {
+        console.log('handleObserver rendered');
+        const target = entries[0];
+        if (target.isIntersecting) {
+            fetchAPIData();
+        }
     }, []);
+
+    useEffect(() => {
+        const option = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0,
+        };
+        if (lastRow.current) {
+            const observer = new IntersectionObserver(handleObserver, option);
+            observer.observe(lastRow.current);
+        }
+    }, [handleObserver]);
 
     const columns = [
         'firstName',
@@ -73,10 +89,10 @@ const DataGridWrapper = ({ apiUrl }) => {
     const options = {
         sort: false,
         columns: columns,
-        callAPI: fetchAPIData,
         totalRows: 10000,
         loading,
         columnWidths,
+        lastRowRef: lastRow
     };
 
     return (
