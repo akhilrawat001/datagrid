@@ -1,31 +1,57 @@
 .dataGrid {
   display: flex;
   flex-direction: column;
-  max-width: 80%;
   margin: 0 auto;
+  overflow: scroll;
+  height: 100%;
 
   .dataGrid__header {
 	display: flex;
-	background-color: #ccc;
+	position: sticky;
+	top: 0;
 
 	.dataGrid__headerCell {
 	  padding: 8px;
-	  border: 1px solid #aaa;
+	  border-bottom: 1px solid #aaa;
+	  background-color: #ccc;
+	  font-size: 14px;
+	  min-width: 80px;
+	  flex-shrink: 0;
+	  text-align: left;
+	  border-right: 2px solid black;
 	}
   }
 
   .dataGrid__body {
+
+	&.loading {
+	  filter: blur(10px);
+	}
+
 	.dataGrid__row {
 	  display: flex;
 
-	  &:nth-child(even) {
-		background-color: #f5f5f5;
-	  }
-
 	  .dataGrid__cell {
 		padding: 8px;
-		border: 1px solid #aaa;
+		border-bottom: 1px solid #aaa;
+		font-size: 14px;
+		min-width: 80px;
+		word-wrap: break-word;
+		flex-shrink: 0;
+		text-align: left;
+		border-right: 2px solid black;
+		white-space: nowrap;
+	  }
+
+	  &:nth-child(even) {
+		.dataGrid__cell {
+		  background: #f5f5f5;
+		}
 	  }
 	}
+  }
+
+  .loader {
+	text-align: center;
   }
 }

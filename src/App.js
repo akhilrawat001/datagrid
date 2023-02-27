@@ -1,39 +1,18 @@
 import React from 'react';
 import styles from './App.module.scss';
-import DataGrid from './components/DataGrid/DataGrid';
 
-function App() {
+import DataGridWrapper from './components/DataGridWrapper/DataGridWrapper';
 
-    const data = [];
-    for (let i = 1; i <= 10; i++) {
-        const row = { id: i };
+const dev = false;
 
-        for (let j = 1; j <= 15; j++) {
-            row[`column_${j}`] = `Row ${i}, Column ${j}`;
-        }
-
-        data.push(row);
-    }
-
-    const columns = [];
-    for (let i = 1; i <= 15; i++) {
-        columns.push({
-            name: `Column ${i}`,
-            field: `column_${i}`
-        });
-    }
-
-    const options = {
-        sort: false,
-        columns: columns
-    };
-
+const App = () => {
+    const apiUrl = dev ? 'http://0.0.0.0:3001/data' : 'https://datagrid-backend.glitch.me/data';
     return (
-        <div className={styles.app}>
+        <div>
             <h1 className={styles.appHeading}>DataGrid</h1>
-            <DataGrid options={options} data={data}/>
+            <DataGridWrapper apiUrl={apiUrl}/>
         </div>
     );
-}
+};
 
 export default App;
