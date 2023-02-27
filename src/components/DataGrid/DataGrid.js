@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './DataGrid.module.scss';
 import sortBy from 'lodash.sortby';
 import filter from 'lodash.filter';
@@ -54,13 +54,14 @@ function DataGrid({
         loading,
         totalRows,
         columnWidths,
-        lastRowRef
+        lastRowRef,
+        searchTerm,
+        setSearchTerm,
     } = options;
     const [sortedData, setSortedData] = useState([]);
     const [tableData, setTableData] = useState([]);
     const [sortKey, setSortKey] = useState('');
     const [sortingType, setSortingType] = useState(NO_SORT);
-    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         if (sortKey) {

@@ -3,7 +3,7 @@ import styles from './App.module.scss';
 
 import DataGridWrapper from './components/DataGridWrapper/DataGridWrapper';
 
-const dev = false;
+const dev = window.location.protocol === 'http:';
 
 const App = () => {
     const apiUrl = dev ? 'http://0.0.0.0:3001/data' : 'https://datagrid-backend.glitch.me/data';

@@ -9,6 +9,7 @@ const DataGridWrapper = ({ apiUrl }) => {
     const [loading, setLoading] = useState(false);
     const [columnWidths, setColumnWidths] = useState({});
     const lastRow = useRef(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         for (let index in columns) {
@@ -41,12 +42,11 @@ const DataGridWrapper = ({ apiUrl }) => {
     };
 
     const handleObserver = useCallback((entries) => {
-        console.log('handleObserver rendered');
         const target = entries[0];
-        if (target.isIntersecting) {
+        if (target.isIntersecting && !searchTerm.length) {
             fetchAPIData();
         }
-    }, []);
+    }, [!!searchTerm.length]);
 
     useEffect(() => {
         const option = {
@@ -60,39 +60,43 @@ const DataGridWrapper = ({ apiUrl }) => {
         }
     }, [handleObserver]);
 
-    const columns = [
-        'firstName',
-        'lastname',
-        'number',
-        'email',
-        'birthdate',
-        'address',
-        'sex',
-        'gender',
-        'jobTitle',
-        'department',
-        'company',
-        'subscriptionTier',
-        'ipv4',
-        'ipv6',
-        'mac',
-        'creditCard',
-        'salary',
-        'manufacturer',
-        'model',
-        'vin'
-    ].map((item) => ({
-        name: item.toUpperCase(),
-        field: item
-    }));
+    const columnsObj = {
+        'firstName': 'First Name',
+        'lastname': 'Last Name',
+        'number': 'Phone Number',
+        'email': 'E-mail',
+        'birthdate': 'Date of birth',
+        'address': 'Address',
+        'sex': 'Sex',
+        'gender': 'Gender',
+        'jobTitle': 'Job Title',
+        'department': 'Department',
+        'company': 'Company',
+        'subscriptionTier': 'Subscription Tier',
+        'ipv4': 'IPV4',
+        'ipv6': 'IPV6',
+        'mac': 'MAC Address',
+        'creditCard': ' Create Card No.',
+        'salary': 'Salary',
+        'manufacturer': 'Manufacturer',
+        'model': 'Model',
+        'vin': 'VIN',
+    };
+    const columns = Object.keys(columnsObj)
+        .map((key) => ({
+            name: columnsObj[key],
+            field: key
+        }));
 
     const options = {
         sort: false,
         columns: columns,
         totalRows: 10000,
+        lastRowRef: lastRow,
         loading,
         columnWidths,
-        lastRowRef: lastRow
+        searchTerm,
+        setSearchTerm,
     };
 
     return (
