@@ -32,6 +32,6 @@ const getColumnWidth = (column, data, header) => {
     const longestValueWidth = getStringWidth(longestValue);
     const headerWidth = getStringWidth(header);
     const width = Math.max(longestValueWidth, headerWidth);
-    return width + 20;
+    return width + 40;
 };
 export default getColumnWidth;

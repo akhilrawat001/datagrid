@@ -4,6 +4,9 @@
   margin: 0 auto;
   overflow: scroll;
   height: 100%;
+  border: 1px solid #ededf0;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
 
   .dataGrid__header {
 	display: flex;
@@ -11,14 +14,34 @@
 	top: 0;
 
 	.dataGrid__headerCell {
-	  padding: 8px;
-	  border-bottom: 1px solid #aaa;
-	  background-color: #ccc;
+	  padding: 16px 8px;
+	  border-bottom: 1px solid #ededf0;
+	  background: #FFFFFF;
 	  font-size: 14px;
 	  min-width: 80px;
 	  flex-shrink: 0;
 	  text-align: left;
-	  border-right: 2px solid black;
+	  display: flex;
+	  align-items: center;
+	  cursor: pointer;
+	  user-select: none;
+
+	  &:hover {
+
+	  }
+
+	  .dataGrid__sortContainer {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-left: 2px;
+	  }
+
+	  &:hover {
+		.dataGrid__sortContainer {
+		  background-color: rgba(0, 0, 0, 0.04);
+		}
+	  }
 	}
   }
 
@@ -28,25 +51,39 @@
 	  filter: blur(10px);
 	}
 
+	.dataGrid__lastRow {
+	  opacity: 0;
+	  height: 0;
+	  float: left;
+	  clear: left;
+
+	  .dataGrid__row {
+		height: 0;
+
+		.dataGrid__cell {
+		  padding: 0;
+		}
+	  }
+	}
+
 	.dataGrid__row {
 	  display: flex;
+	  float: left;
+	  clear: left;
+
+	  &:hover {
+		background-color: rgba(0, 0, 0, 0.04);
+	  }
 
 	  .dataGrid__cell {
 		padding: 8px;
-		border-bottom: 1px solid #aaa;
+		border-bottom: 1px solid #ededf0;
 		font-size: 14px;
 		min-width: 80px;
 		word-wrap: break-word;
 		flex-shrink: 0;
 		text-align: left;
-		border-right: 2px solid black;
 		white-space: nowrap;
-	  }
-
-	  &:nth-child(even) {
-		.dataGrid__cell {
-		  background: #f5f5f5;
-		}
 	  }
 	}
   }
@@ -54,4 +91,37 @@
   .loader {
 	text-align: center;
   }
+}
+
+.dataGrid__footer {
+  border: 1px solid #ededf0;
+  border-radius: 0 0 4px 4px;
+  padding: 16px 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .paginationInfo {
+	text-align: right;
+  }
+
+
+  .searchContainer {
+
+	.icon {
+	  position: relative;
+	  left: 14px;
+	  top: 4px;
+	}
+
+	.search {
+	  border: none;
+	  border-bottom: 1px solid #53669f;
+	  height: 40px;
+	  outline: none;
+	  padding: 2px 2px 2px 20px;
+	}
+  }
+
 }

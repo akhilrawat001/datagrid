@@ -2,10 +2,27 @@ import React, { useEffect, useState } from 'react';
 import styles from './DataGridWrapper.module.scss';
 import DataGrid from '../DataGrid/DataGrid';
 import axios from 'axios';
+import getColumnWidth from '../../utils/ColumnWidth';
+
 
 const DataGridWrapper = ({ apiUrl }) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [columnWidths, setColumnWidths] = useState({});
+
+    useEffect(() => {
+        for (let index in columns) {
+            const column = columns[index];
+            const field = column.field;
+            const width = getColumnWidth(field, data, column.name);
+            setColumnWidths((prevState) => {
+                return {
+                    ...prevState,
+                    [field]: width
+                };
+            });
+        }
+    }, [data.length]);
 
     const fetchAPIData = () => {
         setLoading(true);
@@ -57,7 +74,9 @@ const DataGridWrapper = ({ apiUrl }) => {
         sort: false,
         columns: columns,
         callAPI: fetchAPIData,
-        loading: loading
+        totalRows: 10000,
+        loading,
+        columnWidths,
     };
 
     return (
