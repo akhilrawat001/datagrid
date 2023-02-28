@@ -35,7 +35,13 @@ const DarkThemeSwitch = ({
     setTheme
 }) => {
     return (
-        <div onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} style={{ cursor: 'pointer' }}>
+        <div
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            style={{
+                cursor: 'pointer',
+                fontSize: '20px'
+            }}
+        >
             {
                 theme === 'dark' ?
                     <MdLightMode/>
@@ -58,15 +64,18 @@ const DataGridCell = ({
 		&& ((pinnedColumns.indexOf(field) + 1) === pinnedColumns.length);
 
     return (
-        <div className={styles.dataGrid__cell} style={{
-            width: `${columnWidths[field]}px`,
-            textAlign,
-            position: 'sticky',
-            top: isPinned ? 0 : 'unset',
-            left: isPinned ? `${leftPosition}px` : 'unset',
-            zIndex: isPinned ? 1 : 'unset',
-            borderRight: isLastPinnedItem ? '1px solid' : 'none',
-        }}>
+        <div
+            className={isPinned
+                ? `${styles.dataGrid__cell} ${styles.pinned}`
+                : styles.dataGrid__cell
+            }
+            style={{
+                width: `${columnWidths[field]}px`,
+                textAlign,
+                left: isPinned ? `${leftPosition}px` : 'unset',
+                borderRight: isLastPinnedItem ? '1px solid' : 'none',
+            }}
+        >
             <FormattedCellValue type={type} value={data[field] || '-'}/>
         </div>
     );
@@ -77,10 +86,12 @@ const DataGridRow = ({
     rIndex,
     columnWidths,
     pinnedColumns,
+    rowWidth
 }) => {
     return (
         <div
             className={styles.dataGrid__row}
+            style={{width: rowWidth}}
         >
             {
                 columns.map(
@@ -147,6 +158,8 @@ function DataGrid({
     const [sortingType, setSortingType] = useState(NO_SORT);
     const [pinnedColumns, setPinnedColumns] = useState([]);
     const [tableColumns, setTableColumns] = useState([]);
+    const tableRef = useRef(null);
+    const [rowWidth, setRowWidth] = useState('fit-content');
 
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -209,8 +222,6 @@ function DataGrid({
         }
     };
 
-    console.log(pinnedColumns);
-
     const handleObserver = (entries) => {
         const target = entries[0];
         if (target.isIntersecting && searchTerm === '' && !loading) {
@@ -235,8 +246,8 @@ function DataGrid({
             observer.current.disconnect();
         }
         observer.current = new IntersectionObserver(handleObserver, observerOptions);
-        const term = searchTerm;
 
+        const term = searchTerm;
         if (term) {
             return filter(rawData, (item) => {
                 let isMatch = false;
@@ -273,7 +284,7 @@ function DataGrid({
         }
         return () => observer.current.disconnect();
 
-    }, [tableData.length]);
+    }, [JSON.stringify(tableData)]);
 
     useEffect(() => {
         if (pinnedColumns.length) {
@@ -286,11 +297,24 @@ function DataGrid({
         }
     }, [pinnedColumns, data.length]);
 
+    useEffect(() => {
+        const colSum = Object.keys(columnWidths)
+            .reduce((accumulator, item) => {
+                return accumulator + columnWidths[item];
+            }, 0);
+
+        if (colSum < tableRef?.current?.clientWidth) {
+            setRowWidth('100%');
+        } else {
+            setRowWidth('fit-content');
+        }
+    }, [columnWidths]);
+
     return (
-        <div className={getDarkModeClass(styles.dataGrid, styles.dark, theme)}>
+        <div className={getDarkModeClass(styles.dataGrid, styles.dark, theme)} ref={tableRef}>
             <div className={styles.dataGrid__table}>
                 <div className={styles.dataGrid__header}>
-                    <div className={styles.dataGrid__headerRow}>
+                    <div className={styles.dataGrid__headerRow} style={{width: rowWidth}}>
                         {tableColumns.map((column) => {
                             const isPinned = pinnedColumns.includes(column.field);
                             const leftPosition = getLeftPositionForColumn(isPinned, pinnedColumns, column.field, columnWidths);
@@ -299,14 +323,14 @@ function DataGrid({
                             return (
                                 <div
                                     key={column.field}
-                                    className={styles.dataGrid__headerCell}
+                                    className={isPinned
+                                        ? `${styles.dataGrid__headerCell} ${styles.pinned}`
+                                        : styles.dataGrid__headerCell
+                                    }
                                     style={{
                                         width: `${columnWidths[column.field]}px`,
                                         justifyContent: getTextAlignmentForColumn(column.type),
-                                        position: 'sticky',
-                                        top: isPinned ? 0 : 'unset',
                                         left: isPinned ? `${leftPosition}px` : 'unset',
-                                        zIndex: isPinned ? 1 : 'unset',
                                         borderRight: isLastPinnedItem ? '1px solid' : 'none',
                                     }}
                                 >
@@ -340,12 +364,13 @@ function DataGrid({
                         tableData.map((row, index) =>
                             (
                                 <DataGridRow
+                                    key={`row-${index}`}
                                     row={row}
                                     rIndex={index}
                                     columns={tableColumns}
                                     columnWidths={columnWidths}
-                                    key={`row-${index}`}
                                     pinnedColumns={pinnedColumns}
+                                    rowWidth={rowWidth}
                                 />
                             ))
                     }
@@ -359,9 +384,11 @@ function DataGrid({
                                 >
                                     <DataGridRow
                                         row={tableData[0]}
+                                        rIndex={tableData.length}
                                         columns={tableColumns}
                                         columnWidths={columnWidths}
                                         pinnedColumns={pinnedColumns}
+                                        rowWidth={rowWidth}
                                     />
                                 </div>
                             ) : null

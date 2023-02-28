@@ -1,13 +1,4 @@
-@mixin tableCellStyles {
-  background-color: inherit;
-  border-bottom: 1px solid;
-  border-color: #ededf0 !important;
-  font-size: 14px;
-  min-width: 80px;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
+$borderColor: #ededf0;
 $darkModeFontColor: #d7d7d7;
 $darkModeBackgroundColor: #1d1e23;
 $darkModeBackgroundColor1: #24262c;
@@ -15,6 +6,21 @@ $darkModeLinkColor: #5780b0;
 $darkModeBorderColor: rgba(59, 66, 80, 0.7);
 $darkModeBorderColor1: #606060;
 $darkModeHover: #4d4d4d;
+
+@mixin tableCellStyles {
+  position: sticky;
+  background-color: inherit;
+  font-size: 14px;
+  min-width: 80px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  border-color: $borderColor !important;
+}
+
+@mixin pinnedCellStyles {
+  top: 0;
+  z-index: 1;
+}
 
 
 .dataGrid {
@@ -28,7 +34,7 @@ $darkModeHover: #4d4d4d;
 	flex-direction: column;
 	margin: 0 auto;
 	overflow: scroll;
-	border: 1px solid #ededf0;
+	border: 1px solid $borderColor;
 	border-bottom: none;
 	border-radius: 4px 4px 0 0;
 	height: calc(100% - 74px);
@@ -42,10 +48,13 @@ $darkModeHover: #4d4d4d;
 
 	  .dataGrid__headerRow {
 		display: flex;
+		justify-content: space-between;
+		width: fit-content;
 		top: 0;
 		float: left;
 		clear: left;
 		background-color: inherit;
+		border-bottom: 1px solid $borderColor;
 
 		.dataGrid__headerCell {
 		  padding: 16px 8px;
@@ -55,6 +64,10 @@ $darkModeHover: #4d4d4d;
 		  user-select: none;
 		  @include tableCellStyles;
 
+		  &.pinned {
+			@include pinnedCellStyles;
+		  }
+
 		  .dataGrid__sortContainer, .dataGrid__pinContainer {
 			display: flex;
 			align-items: center;
@@ -63,6 +76,7 @@ $darkModeHover: #4d4d4d;
 			margin-left: 2px;
 			padding: 4px;
 			border-radius: 50%;
+
 
 			&:hover {
 			  background-color: rgba(0, 0, 0, 0.04);
@@ -77,6 +91,7 @@ $darkModeHover: #4d4d4d;
 	}
 
 	.dataGrid__body {
+	  background-color: inherit;
 
 	  .dataGrid__link {
 		color: #3ba3e3;
@@ -103,23 +118,31 @@ $darkModeHover: #4d4d4d;
 
 	  .dataGrid__row {
 		display: flex;
+		justify-content: space-between;
+		width: fit-content;
 		float: left;
 		clear: left;
+		background-color: inherit;
+		border-bottom: 1px solid $borderColor;
 
 		&:hover {
-		  background-color: rgba(0, 0, 0, 0.04);
+		  background-color: rgb(219, 216, 216);
 		}
 
 		.dataGrid__cell {
 		  padding: 8px;
 		  @include tableCellStyles;
+
+		  &.pinned {
+			@include pinnedCellStyles;
+		  }
 		}
 	  }
 	}
   }
 
   .dataGrid__footer {
-	border: 1px solid #ededf0;
+	border: 1px solid $borderColor;
 	border-radius: 0 0 4px 4px;
 	padding: 16px 16px;
 	height: 74px;
@@ -165,6 +188,7 @@ $darkModeHover: #4d4d4d;
 	  .dataGrid__header {
 
 		.dataGrid__headerRow {
+		  border-color: $darkModeBorderColor;
 
 		  .dataGrid__headerCell {
 			border-color: $darkModeBorderColor !important;
@@ -187,6 +211,7 @@ $darkModeHover: #4d4d4d;
 
 		.dataGrid__row {
 		  background-color: $darkModeBackgroundColor;
+		  border-color: $darkModeBorderColor;
 
 		  &:hover {
 			background-color: $darkModeHover;
