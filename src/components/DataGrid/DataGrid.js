@@ -5,19 +5,35 @@ import filter from 'lodash.filter';
 import forEach from 'lodash.foreach';
 import { AiOutlineSearch, AiOutlineSortAscending, AiOutlineSortDescending } from 'react-icons/ai';
 import { TiArrowUnsorted } from 'react-icons/ti';
+import getColumnWidth from '../../utils/ColumnWidth';
 
 const ASCENDING_SORT = 'ASC';
 const DESCENDING_SORT = 'DESC';
 const NO_SORT = 'NONE';
 
+const FormattedCellValue = ({
+    value,
+    type
+}) => {
+    if (type === 'email') {
+        return (<a className={styles.dataGrid__link} href={`mailto:${value}`}>{value}</a>);
+    }
+    return value;
+};
+
 const DataGridCell = ({
     data,
     field,
     columnWidths,
+    type,
 }) => {
+    const textAlign = getTextAlignmentForCell(type);
     return (
-        <div className={styles.dataGrid__cell} style={{ width: `${columnWidths[field]}px`, }}>
-            {data[field] || '-'}
+        <div className={styles.dataGrid__cell} style={{
+            width: `${columnWidths[field]}px`,
+            textAlign,
+        }}>
+            <FormattedCellValue type={type} value={data[field] || '-'}/>
         </div>
     );
 };
@@ -37,6 +53,7 @@ const DataGridRow = ({
                             field={column.field}
                             key={`cell-${rIndex}-${cIndex}`}
                             columnWidths={columnWidths}
+                            type={column.type}
                         />
                     )
                 )
@@ -44,6 +61,21 @@ const DataGridRow = ({
         </div>
     );
 };
+
+const getTextAlignmentForColumn = (type) => {
+    if (type === 'number') {
+        return 'flex-end';
+    }
+    return 'flex-start';
+};
+const getTextAlignmentForCell = (type) => {
+    if (type === 'number') {
+        return 'right';
+    }
+    return 'left';
+};
+
+const DATA_GRID_LAST_ROW_ID = 'data-grid-last-row-id';
 
 function DataGrid({
     options,
@@ -53,7 +85,6 @@ function DataGrid({
         columns,
         loading,
         totalRows,
-        columnWidths,
         setLoading,
     } = options;
 
@@ -70,6 +101,22 @@ function DataGrid({
         rootMargin: '0px',
         threshold: 0
     };
+
+    const [columnWidths, setColumnWidths] = useState({});
+
+    useEffect(() => {
+        for (let index in columns) {
+            const column = columns[index];
+            const field = column.field;
+            const width = getColumnWidth(field, data, column.name);
+            setColumnWidths((prevState) => {
+                return {
+                    ...prevState,
+                    [field]: width
+                };
+            });
+        }
+    }, [data.length]);
 
     const handleSort = (column) => {
         if (sortKey === column.field) {
@@ -150,7 +197,7 @@ function DataGrid({
         observer.current = new IntersectionObserver(handleObserver, observerOptions);
 
         if (tableData.length > 0) {
-            observer.current.observe(document.querySelector('#data-grid-last-row'));
+            observer.current.observe(document.querySelector(`#${DATA_GRID_LAST_ROW_ID}`));
         }
         return () => observer.current.disconnect();
 
@@ -166,6 +213,7 @@ function DataGrid({
                             className={styles.dataGrid__headerCell}
                             style={{
                                 width: `${columnWidths[column.field]}px`,
+                                justifyContent: getTextAlignmentForColumn(column.type)
                             }}
                             onClick={() => handleSort(column)}
                         >
@@ -188,21 +236,26 @@ function DataGrid({
                     {
                         tableData.map((row, index) =>
                             (
-                                <DataGridRow
-                                    row={row}
-                                    key={`row-${index}`}
-                                    columns={columns}
-                                    columnWidths={columnWidths}
-                                />
+                                <React.Fragment key={`row-${index}`}>
+                                    <DataGridRow
+                                        row={row}
+                                        rIndex={index}
+                                        columns={columns}
+                                        columnWidths={columnWidths}
+                                    />
+                                </React.Fragment>
                             ))
                     }
                     {
                         tableData.length
                             ? (
-                                <div className={styles.dataGrid__lastRow} id="data-grid-last-row">
+                                <div
+                                    className={styles.dataGrid__lastRow}
+                                    id={DATA_GRID_LAST_ROW_ID}
+                                    key={'last-row'}
+                                >
                                     <DataGridRow
-                                        row={tableData[0] || {}}
-                                        key={'last-row'}
+                                        row={tableData[0]}
                                         columns={columns}
                                         columnWidths={columnWidths}
                                     />

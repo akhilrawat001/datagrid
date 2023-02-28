@@ -43,6 +43,10 @@
 
   .dataGrid__body {
 
+	.dataGrid__link {
+	  color: #3ba3e3;
+	}
+
 	&.loading {
 	  filter: blur(10px);
 	}
