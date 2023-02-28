@@ -1,126 +1,157 @@
-.dataGrid {
-  display: flex;
-  flex-direction: column;
-  margin: 0 auto;
-  overflow: scroll;
-  height: 100%;
-  border: 1px solid #ededf0;
-  border-bottom: none;
-  border-radius: 4px 4px 0 0;
-
-  .dataGrid__header {
-	display: flex;
-	position: sticky;
-	top: 0;
-
-	.dataGrid__headerCell {
-	  padding: 16px 8px;
-	  border-bottom: 1px solid #ededf0;
-	  background: #FFFFFF;
-	  font-size: 14px;
-	  min-width: 80px;
-	  flex-shrink: 0;
-	  text-align: left;
-	  display: flex;
-	  align-items: center;
-	  cursor: pointer;
-	  user-select: none;
-
-	  .dataGrid__sortContainer {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		margin-left: 2px;
-	  }
-
-	  &:hover {
-		.dataGrid__sortContainer {
-		  background-color: rgba(0, 0, 0, 0.04);
-		}
-	  }
-	}
-  }
-
-  .dataGrid__body {
-
-	.dataGrid__link {
-	  color: #3ba3e3;
-	}
-
-	&.loading {
-	  filter: blur(10px);
-	}
-
-	.dataGrid__lastRow {
-	  opacity: 0;
-	  height: 0;
-	  float: left;
-	  clear: left;
-
-	  .dataGrid__row {
-		height: 0;
-
-		.dataGrid__cell {
-		  padding: 0;
-		}
-	  }
-	}
-
-	.dataGrid__row {
-	  display: flex;
-	  float: left;
-	  clear: left;
-
-	  &:hover {
-		background-color: rgba(0, 0, 0, 0.04);
-	  }
-
-	  .dataGrid__cell {
-		padding: 8px;
-		border-bottom: 1px solid #ededf0;
-		font-size: 14px;
-		min-width: 80px;
-		word-wrap: break-word;
-		flex-shrink: 0;
-		text-align: left;
-		white-space: nowrap;
-	  }
-	}
-  }
-
-  .loader {
-	text-align: center;
-  }
+@mixin tableCellStyles {
+  border-bottom: 1px solid #ededf0;
+  font-size: 14px;
+  min-width: 80px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
-.dataGrid__footer {
-  border: 1px solid #ededf0;
-  border-radius: 0 0 4px 4px;
-  padding: 16px 16px;
+.dataGrid {
+  height: 100%;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  .dataGrid__table {
+	display: flex;
+	flex-direction: column;
+	margin: 0 auto;
+	overflow: scroll;
+	border: 1px solid #ededf0;
+	border-bottom: none;
+	border-radius: 4px 4px 0 0;
+	height: calc(100% - 74px);
 
-  .paginationInfo {
-	text-align: right;
-  }
+	.dataGrid__header {
+	  position: sticky;
+	  top: 0;
+	  background: white;
+	  z-index: 10;
 
+	  .dataGrid__headerRow {
+		display: flex;
+		top: 0;
+		float: left;
+		clear: left;
+		background: #ffffff;
 
-  .searchContainer {
+		.dataGrid__headerCell {
+		  padding: 16px 8px;
+		  background: #FFFFFF;
+		  text-align: left;
+		  display: flex;
+		  align-items: center;
+		  user-select: none;
+		  @include tableCellStyles;
 
-	.icon {
-	  position: relative;
-	  left: 14px;
-	  top: 4px;
+		  .dataGrid__sortContainer {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin-left: 2px;
+			cursor: pointer;
+
+			&:hover {
+			  background-color: rgba(0, 0, 0, 0.04);
+			}
+		  }
+
+		  .dataGrid__pinContainer {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin-left: 8px;
+			cursor: pointer;
+
+			&:hover {
+			  background-color: rgba(0, 0, 0, 0.04);
+			}
+		  }
+		}
+	  }
 	}
 
-	.search {
-	  border: none;
-	  border-bottom: 1px solid #53669f;
-	  height: 40px;
-	  outline: none;
-	  padding: 2px 2px 2px 20px;
+	.dataGrid__body {
+
+	  .dataGrid__link {
+		color: #3ba3e3;
+	  }
+
+	  &.loading {
+		filter: blur(10px);
+	  }
+
+	  .dataGrid__lastRow {
+		opacity: 0;
+		height: 0;
+		float: left;
+		clear: left;
+
+		.dataGrid__row {
+		  height: 0;
+
+		  .dataGrid__cell {
+			padding: 0;
+		  }
+		}
+	  }
+
+	  .dataGrid__row {
+		display: flex;
+		float: left;
+		clear: left;
+
+		&:hover {
+		  background-color: rgba(0, 0, 0, 0.04);
+		}
+
+		.dataGrid__cell {
+		  padding: 8px;
+		  @include tableCellStyles;
+		}
+	  }
+	}
+
+	.loader {
+	  text-align: center;
+	}
+  }
+
+  .dataGrid__footer {
+	border: 1px solid #ededf0;
+	border-radius: 0 0 4px 4px;
+	padding: 16px 16px;
+	height: 74px;
+
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	position: sticky;
+	bottom: 0;
+	background: white;
+	z-index: 10;
+
+	.paginationInfo {
+	  text-align: right;
+	}
+
+
+	.searchContainer {
+
+	  .icon {
+		position: relative;
+		left: 14px;
+		top: 4px;
+	  }
+
+	  .search {
+		border: none;
+		border-bottom: 1px solid #53669f;
+		height: 40px;
+		outline: none;
+		padding: 2px 2px 2px 20px;
+	  }
 	}
   }
 }

@@ -5,6 +5,7 @@ import filter from 'lodash.filter';
 import forEach from 'lodash.foreach';
 import { AiOutlineSearch, AiOutlineSortAscending, AiOutlineSortDescending } from 'react-icons/ai';
 import { TiArrowUnsorted } from 'react-icons/ti';
+import { BsPinAngleFill, BsPinFill } from 'react-icons/bs';
 import getColumnWidth from '../../utils/ColumnWidth';
 
 const ASCENDING_SORT = 'ASC';
@@ -26,12 +27,22 @@ const DataGridCell = ({
     field,
     columnWidths,
     type,
+    pinnedColumns,
 }) => {
     const textAlign = getTextAlignmentForCell(type);
+    const isPinned = pinnedColumns.includes(field);
+    const leftPosition = getLeftPositionForColumn(isPinned,pinnedColumns,field,columnWidths);
+
     return (
         <div className={styles.dataGrid__cell} style={{
             width: `${columnWidths[field]}px`,
             textAlign,
+            position: 'sticky',
+            top: isPinned ? 0 : 'unset',
+            left: isPinned ? `${leftPosition}px` : 'unset',
+            backgroundColor: isPinned ? 'white' : 'inherit',
+            zIndex: isPinned ? 1 : 'unset',
+            fontWeight: isPinned ? 'bold' : 'normal',
         }}>
             <FormattedCellValue type={type} value={data[field] || '-'}/>
         </div>
@@ -42,9 +53,12 @@ const DataGridRow = ({
     columns,
     rIndex,
     columnWidths,
+    pinnedColumns,
 }) => {
     return (
-        <div className={styles.dataGrid__row}>
+        <div
+            className={styles.dataGrid__row}
+        >
             {
                 columns.map(
                     (column, cIndex) => (
@@ -54,6 +68,7 @@ const DataGridRow = ({
                             key={`cell-${rIndex}-${cIndex}`}
                             columnWidths={columnWidths}
                             type={column.type}
+                            pinnedColumns={pinnedColumns}
                         />
                     )
                 )
@@ -77,6 +92,22 @@ const getTextAlignmentForCell = (type) => {
 
 const DATA_GRID_LAST_ROW_ID = 'data-grid-last-row-id';
 
+function getLeftPositionForColumn(isPinned, pinnedColumns, field, columnWidths) {
+    if (isPinned) {
+        const index = pinnedColumns.indexOf(field);
+        const pinnedElementsBeforeColumn = pinnedColumns.slice(0, index);
+        if (pinnedElementsBeforeColumn.length) {
+            return pinnedElementsBeforeColumn.reduce((accumulator, item) => {
+                if (pinnedElementsBeforeColumn.includes(item)) {
+                    return accumulator + columnWidths[item];
+                }
+                return accumulator;
+            }, 0);
+        }
+    }
+    return 0;
+}
+
 function DataGrid({
     options,
     data
@@ -91,6 +122,8 @@ function DataGrid({
     const [tableData, setTableData] = useState([]);
     const [sortKey, setSortKey] = useState('');
     const [sortingType, setSortingType] = useState(NO_SORT);
+    const [pinnedColumns, setPinnedColumns] = useState([]);
+    const [tableColumns, setTableColumns] = useState([]);
 
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -138,6 +171,20 @@ function DataGrid({
             setSortKey(column.field);
         }
     };
+
+    const handlePin = (column) => {
+        if (pinnedColumns.includes(column)) {
+            setPinnedColumns((prevState) => {
+                return prevState.filter((item) => item !== column);
+            });
+        } else {
+            setPinnedColumns((prevState) => {
+                return [...prevState, column];
+            });
+        }
+    };
+
+    console.log(pinnedColumns);
 
     const handleObserver = (entries) => {
         const target = entries[0];
@@ -203,47 +250,74 @@ function DataGrid({
 
     }, [tableData.length]);
 
+    useEffect(() => {
+        if (pinnedColumns.length) {
+            setTableColumns(sortBy(columns, (item) => {
+                const index = pinnedColumns.indexOf(item.field);
+                return index !== -1 ? index : Infinity;
+            }));
+        } else {
+            setTableColumns(columns);
+        }
+    }, [pinnedColumns, data.length]);
+
     return (
-        <>
-            <div className={styles.dataGrid}>
+        <div className={styles.dataGrid}>
+            <div className={styles.dataGrid__table}>
                 <div className={styles.dataGrid__header}>
-                    {columns.map(column => (
-                        <div
-                            key={column.field}
-                            className={styles.dataGrid__headerCell}
-                            style={{
-                                width: `${columnWidths[column.field]}px`,
-                                justifyContent: getTextAlignmentForColumn(column.type)
-                            }}
-                            onClick={() => handleSort(column)}
-                        >
-                            {column.name}
-                            <span className={styles.dataGrid__sortContainer}>
-                                {
-                                    sortKey === column.field
-                                        ? (
-                                            sortingType === ASCENDING_SORT
-                                                ? <AiOutlineSortAscending/>
-                                                : <AiOutlineSortDescending/>
-                                        )
-                                        : <TiArrowUnsorted/>
-                                }
-                            </span>
-                        </div>
-                    ))}
+                    <div className={styles.dataGrid__headerRow}>
+                        {tableColumns.map((column) => {
+                            const isPinned = pinnedColumns.includes(column.field);
+                            const leftPosition = getLeftPositionForColumn(isPinned, pinnedColumns, column.field, columnWidths);
+                            return (
+                                <div
+                                    key={column.field}
+                                    className={styles.dataGrid__headerCell}
+                                    style={{
+                                        width: `${columnWidths[column.field]}px`,
+                                        justifyContent: getTextAlignmentForColumn(column.type),
+                                        position: 'sticky',
+                                        top: isPinned ? 0 : 'unset',
+                                        left: isPinned ? `${leftPosition}px` : 'unset',
+                                        backgroundColor: isPinned ? 'white' : 'inherit',
+                                        zIndex: isPinned ? 1 : 'unset',
+                                        fontWeight: isPinned ? 'bold' : 'normal',
+                                    }}
+                                >
+                                    {column.name}
+                                    <span className={styles.dataGrid__sortContainer} onClick={() => handleSort(column)}>
+                                        {
+                                            sortKey === column.field
+                                                ? (
+                                                    sortingType === ASCENDING_SORT
+                                                        ? <AiOutlineSortAscending/>
+                                                        : <AiOutlineSortDescending/>
+                                                )
+                                                : <TiArrowUnsorted/>
+                                        }
+                                    </span>
+                                    <span className={styles.dataGrid__pinContainer} onClick={() => handlePin(column.field)}>
+                                        {
+                                            isPinned ? <BsPinFill/> : <BsPinAngleFill/>
+                                        }
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
                 <div className={loading ? `${styles.dataGrid__body} ${styles.loading}` : styles.dataGrid__body}>
                     {
                         tableData.map((row, index) =>
                             (
-                                <React.Fragment key={`row-${index}`}>
-                                    <DataGridRow
-                                        row={row}
-                                        rIndex={index}
-                                        columns={columns}
-                                        columnWidths={columnWidths}
-                                    />
-                                </React.Fragment>
+                                <DataGridRow
+                                    row={row}
+                                    rIndex={index}
+                                    columns={tableColumns}
+                                    columnWidths={columnWidths}
+                                    key={`row-${index}`}
+                                    pinnedColumns={pinnedColumns}
+                                />
                             ))
                     }
                     {
@@ -256,8 +330,9 @@ function DataGrid({
                                 >
                                     <DataGridRow
                                         row={tableData[0]}
-                                        columns={columns}
+                                        columns={tableColumns}
                                         columnWidths={columnWidths}
+                                        pinnedColumns={pinnedColumns}
                                     />
                                 </div>
                             ) : null
@@ -282,7 +357,7 @@ function DataGrid({
                     {totalRows}
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 
