@@ -7,10 +7,18 @@ import { AiOutlineSearch, AiOutlineSortAscending, AiOutlineSortDescending } from
 import { TiArrowUnsorted } from 'react-icons/ti';
 import { BsPinAngleFill, BsPinFill } from 'react-icons/bs';
 import getColumnWidth from '../../utils/ColumnWidth';
+import { MdDarkMode, MdLightMode } from 'react-icons/md';
 
 const ASCENDING_SORT = 'ASC';
 const DESCENDING_SORT = 'DESC';
 const NO_SORT = 'NONE';
+
+const getDarkModeClass = (lightMode, darkMode, theme) => {
+    if (theme === 'dark') {
+        return `${lightMode} ${darkMode}`;
+    }
+    return lightMode;
+};
 
 const FormattedCellValue = ({
     value,
@@ -22,6 +30,20 @@ const FormattedCellValue = ({
     return value;
 };
 
+const DarkThemeSwitch = ({
+    theme,
+    setTheme
+}) => {
+    return (
+        <div onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} style={{ cursor: 'pointer' }}>
+            {
+                theme === 'dark' ?
+                    <MdLightMode/>
+                    : <MdDarkMode/>
+            }
+        </div>);
+};
+
 const DataGridCell = ({
     data,
     field,
@@ -31,7 +53,9 @@ const DataGridCell = ({
 }) => {
     const textAlign = getTextAlignmentForCell(type);
     const isPinned = pinnedColumns.includes(field);
-    const leftPosition = getLeftPositionForColumn(isPinned,pinnedColumns,field,columnWidths);
+    const leftPosition = getLeftPositionForColumn(isPinned, pinnedColumns, field, columnWidths);
+    const isLastPinnedItem = pinnedColumns.length
+		&& ((pinnedColumns.indexOf(field) + 1) === pinnedColumns.length);
 
     return (
         <div className={styles.dataGrid__cell} style={{
@@ -40,9 +64,8 @@ const DataGridCell = ({
             position: 'sticky',
             top: isPinned ? 0 : 'unset',
             left: isPinned ? `${leftPosition}px` : 'unset',
-            backgroundColor: isPinned ? 'white' : 'inherit',
             zIndex: isPinned ? 1 : 'unset',
-            fontWeight: isPinned ? 'bold' : 'normal',
+            borderRight: isLastPinnedItem ? '1px solid' : 'none',
         }}>
             <FormattedCellValue type={type} value={data[field] || '-'}/>
         </div>
@@ -126,6 +149,8 @@ function DataGrid({
     const [tableColumns, setTableColumns] = useState([]);
 
     const [searchTerm, setSearchTerm] = useState('');
+
+    const [theme, setTheme] = useState('dark');
 
     const observer = useRef(null);
 
@@ -262,13 +287,15 @@ function DataGrid({
     }, [pinnedColumns, data.length]);
 
     return (
-        <div className={styles.dataGrid}>
+        <div className={getDarkModeClass(styles.dataGrid, styles.dark, theme)}>
             <div className={styles.dataGrid__table}>
                 <div className={styles.dataGrid__header}>
                     <div className={styles.dataGrid__headerRow}>
                         {tableColumns.map((column) => {
                             const isPinned = pinnedColumns.includes(column.field);
                             const leftPosition = getLeftPositionForColumn(isPinned, pinnedColumns, column.field, columnWidths);
+                            const isLastPinnedItem = pinnedColumns.length && (
+                                (pinnedColumns.indexOf(column.field) + 1) === pinnedColumns.length);
                             return (
                                 <div
                                     key={column.field}
@@ -279,9 +306,8 @@ function DataGrid({
                                         position: 'sticky',
                                         top: isPinned ? 0 : 'unset',
                                         left: isPinned ? `${leftPosition}px` : 'unset',
-                                        backgroundColor: isPinned ? 'white' : 'inherit',
                                         zIndex: isPinned ? 1 : 'unset',
-                                        fontWeight: isPinned ? 'bold' : 'normal',
+                                        borderRight: isLastPinnedItem ? '1px solid' : 'none',
                                     }}
                                 >
                                     {column.name}
@@ -296,7 +322,10 @@ function DataGrid({
                                                 : <TiArrowUnsorted/>
                                         }
                                     </span>
-                                    <span className={styles.dataGrid__pinContainer} onClick={() => handlePin(column.field)}>
+                                    <span
+                                        className={styles.dataGrid__pinContainer}
+                                        onClick={() => handlePin(column.field)}
+                                    >
                                         {
                                             isPinned ? <BsPinFill/> : <BsPinAngleFill/>
                                         }
@@ -349,6 +378,7 @@ function DataGrid({
                         onChange={(event) => setSearchTerm(event.target.value)}
                     />
                 </div>
+                <DarkThemeSwitch theme={theme} setTheme={setTheme}/>
                 <div className={styles.paginationInfo}>
                     {tableData.length}
                     {' '}

@@ -1,5 +1,3 @@
-// const ALL_POSSIBLE_CHARACTERS = 'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890+-()^%$#@,./';
-// const ALL_POSSIBLE_CHARACTERS = 'abcdefghijklmnopqrstuvwxyz';
 const getStringWidth = (string) => {
     const span = document.createElement('span');
     span.style.position = 'absolute';
@@ -32,6 +30,6 @@ const getColumnWidth = (column, data, header) => {
     const longestValueWidth = getStringWidth(longestValue);
     const headerWidth = getStringWidth(header);
     const width = Math.max(longestValueWidth, headerWidth);
-    return width + 40 + 22;
+    return width + 48 + 30;
 };
 export default getColumnWidth;
