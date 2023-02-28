@@ -26,10 +26,6 @@
 	  cursor: pointer;
 	  user-select: none;
 
-	  &:hover {
-
-	  }
-
 	  .dataGrid__sortContainer {
 		display: flex;
 		align-items: center;
@@ -123,5 +119,4 @@
 	  padding: 2px 2px 2px 20px;
 	}
   }
-
 }
