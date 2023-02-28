@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './DataGrid.module.scss';
 import sortBy from 'lodash.sortby';
 import filter from 'lodash.filter';
@@ -54,46 +54,107 @@ function DataGrid({
         loading,
         totalRows,
         columnWidths,
-        lastRowRef,
-        searchTerm,
-        setSearchTerm,
+        setLoading,
     } = options;
-    const [sortedData, setSortedData] = useState([]);
+
     const [tableData, setTableData] = useState([]);
     const [sortKey, setSortKey] = useState('');
     const [sortingType, setSortingType] = useState(NO_SORT);
 
-    useEffect(() => {
-        if (sortKey) {
-            if (sortingType === ASCENDING_SORT) {
-                setSortedData(sortBy(data, sortKey));
-            } else {
-                setSortedData(sortBy(data, sortKey)
-                    .reverse());
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const observer = useRef(null);
+
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0
+    };
+
+    const handleSort = (column) => {
+        if (sortKey === column.field) {
+            switch (sortingType) {
+            case ASCENDING_SORT:
+                setSortingType(DESCENDING_SORT);
+                break;
+            case DESCENDING_SORT:
+                setSortingType(NO_SORT);
+                setSortKey('');
+                break;
+            default:
+                setSortingType(ASCENDING_SORT);
+                setSortKey(column.field);
+                break;
             }
         } else {
-            setSortedData(data);
+            setSortingType(ASCENDING_SORT);
+            setSortKey(column.field);
         }
-    }, [data.length, sortKey, sortingType]);
+    };
 
-    useEffect(() => {
-        if (searchTerm) {
-            const filtered = filter(sortedData, (item) => {
+    const handleObserver = (entries) => {
+        const target = entries[0];
+        if (target.isIntersecting && searchTerm === '' && !loading) {
+            setLoading(true);
+        }
+    };
+
+    const getSortedData = (rawData) => {
+        if (sortKey) {
+            if (sortingType === ASCENDING_SORT) {
+                return sortBy(rawData, sortKey);
+            } else {
+                return sortBy(rawData, sortKey)
+                    .reverse();
+            }
+        }
+        return rawData;
+    };
+
+    const getFilteredData = (rawData) => {
+        if (observer.current) {
+            observer.current.disconnect();
+        }
+        observer.current = new IntersectionObserver(handleObserver, observerOptions);
+        const term = searchTerm;
+
+        if (term) {
+            return filter(rawData, (item) => {
                 let isMatch = false;
                 forEach(item, (value) => {
                     if (String(value)
                         .toLowerCase()
-                        .includes(searchTerm.toLowerCase())) {
+                        .includes(term.toLowerCase())) {
                         isMatch = true;
                     }
                 });
                 return isMatch;
             });
-            setTableData(filtered);
-        } else {
+        }
+        return rawData;
+    };
+
+    useEffect(() => {
+        if (data.length) {
+            const filteredData = getFilteredData(data);
+            const sortedData = getSortedData(filteredData);
             setTableData(sortedData);
         }
-    }, [searchTerm, JSON.stringify(sortedData)]);
+
+    }, [data.length, sortKey, sortingType, searchTerm]);
+
+    useEffect(() => {
+        if (observer.current) {
+            observer.current.disconnect();
+        }
+        observer.current = new IntersectionObserver(handleObserver, observerOptions);
+
+        if (tableData.length > 0) {
+            observer.current.observe(document.querySelector('#data-grid-last-row'));
+        }
+        return () => observer.current.disconnect();
+
+    }, [tableData.length]);
 
     return (
         <>
@@ -106,27 +167,7 @@ function DataGrid({
                             style={{
                                 width: `${columnWidths[column.field]}px`,
                             }}
-                            onClick={
-                                () => {
-                                    if (sortKey === column.field) {
-                                        switch (sortingType) {
-                                        case ASCENDING_SORT:
-                                            setSortingType(DESCENDING_SORT);
-                                            break;
-                                        case DESCENDING_SORT:
-                                            setSortingType(NO_SORT);
-                                            setSortKey('');
-                                            break;
-                                        default:
-                                            setSortingType(ASCENDING_SORT);
-                                            setSortKey(column.field);
-                                            break;
-                                        }
-                                    } else {
-                                        setSortingType(ASCENDING_SORT);
-                                        setSortKey(column.field);
-                                    }
-                                }}
+                            onClick={() => handleSort(column)}
                         >
                             {column.name}
                             <span className={styles.dataGrid__sortContainer}>
@@ -144,23 +185,30 @@ function DataGrid({
                     ))}
                 </div>
                 <div className={loading ? `${styles.dataGrid__body} ${styles.loading}` : styles.dataGrid__body}>
-                    {tableData.map((row, index) =>
-                        (
-                            <DataGridRow
-                                row={row}
-                                key={`row-${index}`}
-                                columns={columns}
-                                columnWidths={columnWidths}
-                            />
-                        ))}
-                    <div ref={lastRowRef} className={styles.dataGrid__lastRow}>
-                        <DataGridRow
-                            row={tableData[0] || {}}
-                            key={'last-row'}
-                            columns={columns}
-                            columnWidths={columnWidths}
-                        />
-                    </div>
+                    {
+                        tableData.map((row, index) =>
+                            (
+                                <DataGridRow
+                                    row={row}
+                                    key={`row-${index}`}
+                                    columns={columns}
+                                    columnWidths={columnWidths}
+                                />
+                            ))
+                    }
+                    {
+                        tableData.length
+                            ? (
+                                <div className={styles.dataGrid__lastRow} id="data-grid-last-row">
+                                    <DataGridRow
+                                        row={tableData[0] || {}}
+                                        key={'last-row'}
+                                        columns={columns}
+                                        columnWidths={columnWidths}
+                                    />
+                                </div>
+                            ) : null
+                    }
                 </div>
             </div>
             <div className={styles.dataGrid__footer}>

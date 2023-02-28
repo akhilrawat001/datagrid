@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './DataGridWrapper.module.scss';
 import DataGrid from '../DataGrid/DataGrid';
 import axios from 'axios';
@@ -6,10 +6,8 @@ import getColumnWidth from '../../utils/ColumnWidth';
 
 const DataGridWrapper = ({ apiUrl }) => {
     const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [columnWidths, setColumnWidths] = useState({});
-    const lastRow = useRef(null);
-    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         for (let index in columns) {
@@ -26,39 +24,24 @@ const DataGridWrapper = ({ apiUrl }) => {
     }, [data.length]);
 
     const fetchAPIData = () => {
-        setLoading(true);
         axios.get(apiUrl)
             .then((response) => {
-                setData((prevState) => {
-                    return [...prevState, ...response.data.data];
-                });
+                setData([...data, ...response.data.data]);
             })
             .catch((error) => {
                 console.error(error);
             })
+
             .finally(() => {
                 setLoading(false);
             });
     };
 
-    const handleObserver = useCallback((entries) => {
-        const target = entries[0];
-        if (target.isIntersecting && !searchTerm.length) {
+    useEffect(() => {
+        if (data.length === 0 || loading) {
             fetchAPIData();
         }
-    }, [!!searchTerm.length]);
-
-    useEffect(() => {
-        const option = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0,
-        };
-        if (lastRow.current) {
-            const observer = new IntersectionObserver(handleObserver, option);
-            observer.observe(lastRow.current);
-        }
-    }, [handleObserver]);
+    }, [loading]);
 
     const columnsObj = {
         'firstName': 'First Name',
@@ -92,11 +75,9 @@ const DataGridWrapper = ({ apiUrl }) => {
         sort: false,
         columns: columns,
         totalRows: 10000,
-        lastRowRef: lastRow,
         loading,
         columnWidths,
-        searchTerm,
-        setSearchTerm,
+        setLoading,
     };
 
     return (
