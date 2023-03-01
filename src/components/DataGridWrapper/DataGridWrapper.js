@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const DataGridWrapper = ({ apiUrl ,lessRows = 0 }) => {
     const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [columns, setColumns] = useState([]);
     const [rowsPerPage, setRowsPerPage] = useState(30);
     const totalRows = 1000;
