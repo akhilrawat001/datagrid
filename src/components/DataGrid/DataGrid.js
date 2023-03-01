@@ -363,6 +363,19 @@ function DataGrid({
                 </div>
                 <div className={loading ? `${styles.dataGrid__body} ${styles.loading}` : styles.dataGrid__body}>
                     {
+
+                        tableData.length === 0 ?
+                            (
+                                <p style={{ textAlign: 'center' }}>
+                                    {
+                                        searchTerm
+                                            ? 'Searched value not found. Please clear search.'
+                                            : 'Loading...'
+                                    }
+                                </p>
+                            ) : null
+                    }
+                    {
                         tableData.map((row, index) =>
                             (
                                 <DataGridRow
