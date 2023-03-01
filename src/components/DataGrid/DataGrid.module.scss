@@ -154,10 +154,6 @@ $darkModeHover: #4d4d4d;
 	background-color: #ffffff;
 	z-index: 10;
 
-	.paginationInfo {
-	  text-align: right;
-	}
-
 	.searchContainer {
 
 	  .icon {
@@ -174,6 +170,20 @@ $darkModeHover: #4d4d4d;
 		height: 40px;
 		outline: none;
 		padding: 2px 2px 2px 20px;
+	  }
+	}
+
+	.paginationContainer {
+	  display: flex;
+	  gap: 16px;
+
+	  .paginationInfo {
+		text-align: right;
+	  }
+
+	  .rowsPerPage {
+		display: flex;
+		gap: 8px;
 	  }
 	}
   }

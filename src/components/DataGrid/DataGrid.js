@@ -91,7 +91,7 @@ const DataGridRow = ({
     return (
         <div
             className={styles.dataGrid__row}
-            style={{width: rowWidth}}
+            style={{ width: rowWidth }}
         >
             {
                 columns.map(
@@ -149,8 +149,10 @@ function DataGrid({
     const {
         columns,
         loading,
-        totalRows,
         setLoading,
+        rowsPerPage,
+        setRowsPerPage,
+        totalRows
     } = options;
 
     const [tableData, setTableData] = useState([]);
@@ -175,7 +177,7 @@ function DataGrid({
 
     const [columnWidths, setColumnWidths] = useState({});
 
-    useEffect(() => {
+    const calculateColumnWidths = async () => {
         for (let index in columns) {
             const column = columns[index];
             const field = column.field;
@@ -187,6 +189,11 @@ function DataGrid({
                 };
             });
         }
+    };
+
+    useEffect(() => {
+        calculateColumnWidths()
+            .then(() => setLoading(false));
     }, [data.length]);
 
     const handleSort = (column) => {
@@ -224,7 +231,7 @@ function DataGrid({
 
     const handleObserver = (entries) => {
         const target = entries[0];
-        if (target.isIntersecting && searchTerm === '' && !loading) {
+        if (target.isIntersecting && searchTerm === '' && !loading && (totalRows - data.length) > 0) {
             setLoading(true);
         }
     };
@@ -314,7 +321,7 @@ function DataGrid({
         <div className={getDarkModeClass(styles.dataGrid, styles.dark, theme)} ref={tableRef}>
             <div className={styles.dataGrid__table}>
                 <div className={styles.dataGrid__header}>
-                    <div className={styles.dataGrid__headerRow} style={{width: rowWidth}}>
+                    <div className={styles.dataGrid__headerRow} style={{ width: rowWidth }}>
                         {tableColumns.map((column) => {
                             const isPinned = pinnedColumns.includes(column.field);
                             const leftPosition = getLeftPositionForColumn(isPinned, pinnedColumns, column.field, columnWidths);
@@ -405,13 +412,29 @@ function DataGrid({
                         onChange={(event) => setSearchTerm(event.target.value)}
                     />
                 </div>
-                <DarkThemeSwitch theme={theme} setTheme={setTheme}/>
-                <div className={styles.paginationInfo}>
-                    {tableData.length}
-                    {' '}
-					of
-                    {' '}
-                    {totalRows}
+                <div className={styles.paginationContainer}>
+                    <DarkThemeSwitch theme={theme} setTheme={setTheme}/>
+                    <div className={styles.rowsPerPage}>
+                        <span>Rows Per Page</span>
+                        <select
+                            value={String(rowsPerPage)}
+                            onChange={(event) => setRowsPerPage(event.target.value)}>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                    <div className={styles.paginationInfo}>
+						Showing
+                        {' '}
+                        {tableData.length}
+                        {' '}
+						of
+                        {' '}
+                        {totalRows}
+                    </div>
                 </div>
             </div>
         </div>

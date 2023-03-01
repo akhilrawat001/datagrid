@@ -7,25 +7,24 @@ const DataGridWrapper = ({ apiUrl }) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [columns, setColumns] = useState([]);
+    const [rowsPerPage, setRowsPerPage] = useState(30);
+    const totalRows = 1000;
 
     const fetchAPIData = () => {
-        axios.get(apiUrl)
+        const numberOfRowsToFetch = Math.min(totalRows - data.length, rowsPerPage);
+        axios.get(`${apiUrl}?rows=${numberOfRowsToFetch}`)
             .then((response) => {
                 const {
                     rowData,
-                    columnData
+                    columnData,
                 } = response.data.data;
                 setColumns(columnData);
                 setData((prevState) => {
-                    setData([...prevState, ...rowData]);
+                    return [...prevState, ...rowData];
                 });
             })
             .catch((error) => {
                 console.error(error);
-            })
-
-            .finally(() => {
-                setLoading(false);
             });
     };
 
@@ -36,11 +35,12 @@ const DataGridWrapper = ({ apiUrl }) => {
     }, [loading]);
 
     const options = {
-        sort: false,
-        columns: columns,
-        totalRows: 10000,
+        columns,
         loading,
         setLoading,
+        rowsPerPage,
+        setRowsPerPage,
+        totalRows,
     };
 
     return (
