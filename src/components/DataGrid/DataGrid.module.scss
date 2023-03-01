@@ -37,8 +37,16 @@ $darkModeHover: #4d4d4d;
 	border: 1px solid $borderColor;
 	border-bottom: none;
 	border-radius: 4px 4px 0 0;
-	height: calc(100% - 74px);
+	height: calc(100% - 58px);
 	background-color: #ffffff;
+
+	@media (max-width: 680px) {
+	  height: calc(100% - 100px);
+	}
+
+	@media (max-width: 480px) {
+	  height: calc(100% - 132px);
+	}
 
 	.dataGrid__header {
 	  position: sticky;
@@ -144,8 +152,8 @@ $darkModeHover: #4d4d4d;
   .dataGrid__footer {
 	border: 1px solid $borderColor;
 	border-radius: 0 0 4px 4px;
-	padding: 16px 16px;
-	height: 74px;
+	padding: 8px 16px;
+	height: 58px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -153,9 +161,19 @@ $darkModeHover: #4d4d4d;
 	bottom: 0;
 	background-color: #ffffff;
 	z-index: 10;
+	gap: 16px;
+
+
+	@media (max-width: 680px) {
+	  flex-direction: column;
+	  justify-content: flex-start;
+	  height: 100px;
+	};
+	@media (max-width: 480px) {
+	  height: 132px;
+	};
 
 	.searchContainer {
-
 	  .icon {
 		position: relative;
 		left: 14px;
@@ -176,15 +194,48 @@ $darkModeHover: #4d4d4d;
 	.paginationContainer {
 	  display: flex;
 	  gap: 16px;
+	  flex-wrap: wrap;
+	  justify-content: center;
+	  align-items: center;
+	  @media (max-width: 680px) {
+		gap: 8px;
+	  }
+	  @media (max-width: 480px) {
+		.themeSwitch {
+		  flex-basis: fit-content;
+		  display: flex;
+		  justify-content: flex-end;
+		  align-items: center;
+		}
+		.rowsPerPage {
+		  flex-basis: fit-content;
+		  display: flex;
+		  justify-content: flex-start;
+		  align-items: center;
+		}
+		.paginationInfo {
+		  flex-basis: 100%;
+		  display: flex;
+		  justify-content: center;
+		  align-items: center;
+		}
+	  }
 
-	  .paginationInfo {
-		text-align: right;
+	  .themeSwitch {
+		cursor: pointer;
+		font-size: 20px;
 	  }
 
 	  .rowsPerPage {
 		display: flex;
 		gap: 8px;
 	  }
+
+	  .paginationInfo {
+		text-align: right;
+	  }
+
+
 	}
   }
 

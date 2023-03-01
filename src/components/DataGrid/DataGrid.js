@@ -37,10 +37,7 @@ const DarkThemeSwitch = ({
     return (
         <div
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            style={{
-                cursor: 'pointer',
-                fontSize: '20px'
-            }}
+            className={styles.themeSwitch}
         >
             {
                 theme === 'dark' ?
