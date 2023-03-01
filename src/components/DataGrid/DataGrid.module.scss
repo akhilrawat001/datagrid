@@ -52,7 +52,7 @@ $darkModeHover: #4d4d4d;
 	  position: sticky;
 	  top: 0;
 	  z-index: 10;
-	  background-color: inherit;
+	  background-color: #ffffff;
 
 	  .dataGrid__headerRow {
 		display: flex;
@@ -247,6 +247,7 @@ $darkModeHover: #4d4d4d;
 	  background-color: $darkModeBackgroundColor;
 
 	  .dataGrid__header {
+		background-color: $darkModeBackgroundColor;
 
 		.dataGrid__headerRow {
 		  border-color: $darkModeBorderColor;

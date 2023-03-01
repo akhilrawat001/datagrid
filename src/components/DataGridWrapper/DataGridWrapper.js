@@ -3,7 +3,8 @@ import styles from './DataGridWrapper.module.scss';
 import DataGrid from '../DataGrid/DataGrid';
 import axios from 'axios';
 
-const DataGridWrapper = ({ apiUrl ,lessRows = 0 }) => {
+const DataGridWrapper = ({ lessRows = 0 }) => {
+    const apiUrl = 'https://datagrid-backend.glitch.me/data';
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [columns, setColumns] = useState([]);

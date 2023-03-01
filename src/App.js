@@ -4,9 +4,6 @@ import { Routes, Route, Link } from 'react-router-dom';
 
 import DataGridWrapper from './components/DataGridWrapper/DataGridWrapper';
 
-const dev = window.location.protocol === 'http:';
-const apiUrl = dev ? 'http://0.0.0.0:3001/data' : 'https://datagrid-backend.glitch.me/data';
-
 function App() {
     return (
         <div className={styles.headerContainer}>
@@ -29,7 +26,7 @@ function App() {
     );
 }
 
-const LargeTable = () => <DataGridWrapper apiUrl={apiUrl}/>;
-const SmallTable = () => <DataGridWrapper apiUrl={apiUrl} lessRows={1}/>;
+const LargeTable = () => <DataGridWrapper/>;
+const SmallTable = () => <DataGridWrapper lessRows={1}/>;
 
 export default App;
