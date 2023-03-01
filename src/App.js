@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './App.module.scss';
-import {Routes, Route } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 
 import DataGridWrapper from './components/DataGridWrapper/DataGridWrapper';
 
@@ -14,10 +14,10 @@ function App() {
                 <h1>DataGrid</h1>
                 <nav className={styles.navItems}>
                     <p className={styles.navItem}>
-                        <a href="/datagrid">Large Table</a>
+                        <Link to="/datagrid">Large Table</Link>
                     </p>
                     <p className={styles.navItem}>
-                        <a href="/datagrid/small">Small Table</a>
+                        <Link to="/datagrid/small">Small Table</Link>
                     </p>
                 </nav>
             </header>
