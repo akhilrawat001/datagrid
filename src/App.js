@@ -15,7 +15,7 @@ function App() {
                     <h1>DataGrid</h1>
                     <nav className={styles.navItems}>
                         <p className={styles.navItem}>
-                            <a href="/datagrid/large">Large Table</a>
+                            <a href="/datagrid">Large Table</a>
                         </p>
                         <p className={styles.navItem}>
                             <a href="/datagrid/small">Small Table</a>
@@ -23,7 +23,7 @@ function App() {
                     </nav>
                 </header>
                 <Routes>
-                    <Route path="/datagrid/large" element={<LargeTable/>}/>
+                    <Route path="/datagrid" element={<LargeTable/>}/>
                     <Route path="/datagrid/small" element={<SmallTable/>}/>
                 </Routes>
             </div>
