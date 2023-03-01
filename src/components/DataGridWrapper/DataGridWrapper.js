@@ -3,7 +3,7 @@ import styles from './DataGridWrapper.module.scss';
 import DataGrid from '../DataGrid/DataGrid';
 import axios from 'axios';
 
-const DataGridWrapper = ({ apiUrl }) => {
+const DataGridWrapper = ({ apiUrl ,lessRows = 0 }) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [columns, setColumns] = useState([]);
@@ -12,7 +12,7 @@ const DataGridWrapper = ({ apiUrl }) => {
 
     const fetchAPIData = () => {
         const numberOfRowsToFetch = Math.min(totalRows - data.length, rowsPerPage);
-        axios.get(`${apiUrl}?rows=${numberOfRowsToFetch}`)
+        axios.get(`${apiUrl}?rows=${numberOfRowsToFetch}&lessRows=${lessRows}`)
             .then((response) => {
                 const {
                     rowData,
@@ -25,6 +25,9 @@ const DataGridWrapper = ({ apiUrl }) => {
             })
             .catch((error) => {
                 console.error(error);
+            })
+            .finally(() => {
+                setLoading(false);
             });
     };
 

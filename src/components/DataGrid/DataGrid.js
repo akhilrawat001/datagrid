@@ -177,7 +177,7 @@ function DataGrid({
 
     const [columnWidths, setColumnWidths] = useState({});
 
-    const calculateColumnWidths = async () => {
+    useEffect(() => {
         for (let index in columns) {
             const column = columns[index];
             const field = column.field;
@@ -189,11 +189,6 @@ function DataGrid({
                 };
             });
         }
-    };
-
-    useEffect(() => {
-        calculateColumnWidths()
-            .then(() => setLoading(false));
     }, [data.length]);
 
     const handleSort = (column) => {

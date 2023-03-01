@@ -13,6 +13,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1",
+    "react-router-dom": "^6.8.2",
     "react-scripts": "5.0.1",
     "sass": "^1.58.3",
     "web-vitals": "^2.1.4"
@@ -43,7 +44,7 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "https://akhilrawat001.github.io/datagrid",
+  "homepage": "https://akhilrawat001.github.io/datagrid/large",
   "devDependencies": {
     "eslint": "^8.34.0",
     "eslint-config-airbnb": "^19.0.4",
