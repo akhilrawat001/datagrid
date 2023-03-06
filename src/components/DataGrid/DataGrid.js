@@ -174,11 +174,19 @@ function DataGrid({
 
     const [columnWidths, setColumnWidths] = useState({});
 
+    /*
+	 Whenever new rows are fetched this is called to update the row width.
+	 We can optimize it by calculating the width only for the new rows not only for new items.
+	 */
     useEffect(() => {
         for (let index in columns) {
             const column = columns[index];
             const field = column.field;
             const width = getColumnWidth(field, data, column.name);
+            /*
+			instead of setting state multiple times (in the loop) we can just set it once,
+			when the width is calculated for all the columns
+			 */
             setColumnWidths((prevState) => {
                 return {
                     ...prevState,
@@ -223,6 +231,13 @@ function DataGrid({
 
     const handleObserver = (entries) => {
         const target = entries[0];
+        /*
+		- Check if last row is visible
+		- Search should be empty because we don't want to call the API
+		  when users are searching as the last [hidden] row will be visible.
+		- Loading is used for triggering API calls, so we won't make another API call if one is already going on.
+		- If we have fetched all the rows then also we don't need to make the API call
+		 */
         if (target.isIntersecting && searchTerm === '' && !loading && (totalRows - data.length) > 0) {
             setLoading(true);
         }
@@ -244,8 +259,8 @@ function DataGrid({
         if (observer.current) {
             observer.current.disconnect();
         }
+        // This is not needed as use effect will handle it
         observer.current = new IntersectionObserver(handleObserver, observerOptions);
-
         const term = searchTerm;
         if (term) {
             return filter(rawData, (item) => {
@@ -294,6 +309,7 @@ function DataGrid({
         } else {
             setTableColumns(columns);
         }
+        // the second dependency should be columns as pinned columns won't change if more rows are added
     }, [pinnedColumns, data.length]);
 
     useEffect(() => {

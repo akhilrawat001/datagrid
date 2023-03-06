@@ -15,6 +15,7 @@ const getLongestValueForAColumn = (column, data) => {
     let longestValue = '';
     for (let index in data) {
         const row = data[index];
+        // can be changed to const
         let value = String(row[column]);
         const cellLength = value.length;
         if (cellLength > max) {
@@ -30,6 +31,7 @@ const getColumnWidth = (column, data, header) => {
     const longestValueWidth = getStringWidth(longestValue);
     const headerWidth = getStringWidth(header);
     const width = Math.max(longestValueWidth, headerWidth);
+    // these are added for icons and some extra space
     return width + 48 + 30;
 };
 export default getColumnWidth;
